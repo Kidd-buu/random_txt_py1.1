@@ -1,12 +1,21 @@
 import random
 
+# define Item class
+class Item:
+    def __init__(self, name, description, effect):
+        self.name = name
+        self.description = description
+        self.effect = effect
+
 # define Player class
 class Player:
     def __init__(self, name, hp, atk, defense):
         self.name = name
         self.hp = hp
+        self.max_hp = hp  # added attribute to store maximum HP
         self.atk = atk
         self.defense = defense
+        self.inventory = []
         
     def attack(self, enemy):
         # calculate damage based on attack and defense stats
@@ -15,6 +24,18 @@ class Player:
         print(f"{self.name} attacks {enemy.name} and deals {damage} damage!")
         if enemy.hp <= 0:
             print(f"{enemy.name} has been defeated!")
+        
+    def use_item(self, item_index):
+        # use item from inventory and apply effect
+        item = self.inventory[item_index]
+        print(f"{self.name} uses {item.name}! {item.description}")
+        self.hp = min(self.max_hp, self.hp + item.effect)
+        self.inventory.pop(item_index)
+        
+    def add_item(self, item):
+        # add item to inventory
+        print(f"{self.name} adds {item.name} to inventory.")
+        self.inventory.append(item)
         
 # define Enemy class
 class Enemy:
@@ -34,20 +55,42 @@ class Enemy:
     
 # define game function
 def game():
-    # initialize player and enemy
-    player = Player("Knight", 20, 5, 2)
+    # prompt player to enter their name
+    player_name = input("Enter your name: ")
+    
+    # initialize player, enemy, and items
+    player = Player(player_name, 20, 5, 2)
     enemy = Enemy("Dragon", 30, 7, 3)
+    health_potion = Item("Health Potion", "Restores 10 HP.", 10)
+    strength_potion = Item("Strength Potion", "Increases attack by 2.", 0)
+    
+    # add items to player's inventory
+    player.add_item(health_potion)
+    player.add_item(strength_potion)
     
     # game loop
     while player.hp > 0 and enemy.hp > 0:
+        # print player's status and inventory
+        print(f"Player HP: {player.hp}/{player.max_hp}    Enemy HP: {enemy.hp}")
+        print("Inventory:")
+        for i, item in enumerate(player.inventory):
+            print(f" {i+1}: {item.name}")
+            
         # player turn
-        print(f"Player HP: {player.hp}    Enemy HP: {enemy.hp}")
-        choice = input("Attack or Defend? ")
+        choice = input("Attack, Defend, Use item, or Quit? ")
         if choice.lower() == "attack":
             player.attack(enemy)
         elif choice.lower() == "defend":
             player.defense += 1
             print(f"{player.name} defends!")
+        elif choice.lower() == "use item":
+            item_index = int(input("Enter item number: ")) - 1
+            if item_index >= 0 and item_index < len(player.inventory):
+                player.use_item(item_index)
+            else:
+                print("Invalid item number.")
+        elif choice.lower() == "quit":
+            break
         
         # enemy turn
         if enemy.hp > 0:
