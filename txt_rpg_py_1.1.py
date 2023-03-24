@@ -34,8 +34,11 @@ class Enemy:
     
 # define game function
 def game():
+    # prompt player to enter their name
+    player_name = input("Enter your name: ")
+    
     # initialize player and enemy
-    player = Player("Knight", 20, 5, 2)
+    player = Player(player_name, 20, 5, 2)
     enemy = Enemy("Dragon", 30, 7, 3)
     
     # game loop
